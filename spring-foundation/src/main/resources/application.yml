@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:users;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;INIT=CREATE SCHEMA IF NOT EXISTS users;
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+    order:
+      url: jdbc:h2:mem:orders;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;INIT=CREATE SCHEMA IF NOT EXISTS orders;
+      username: sa
+      password: sa
+      driver-class-name: org.h2.Driver
+  jpa:
+    generate-ddl: true
+    hibernate.ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  security:
+    user:
+      name: sa
+      password: sa
+
+management:
+  endpoints:
+    web:
+      base-path: /custom-actuator
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    java:
+      enabled: true
