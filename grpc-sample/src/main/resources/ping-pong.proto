@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package com.example.stub;
+
+option java_package="com.example.stub";
+option java_multiple_files =  true;
+
+service PingPong {
+  rpc getResponse (RequestDto) returns (ResponseDto);
+}
+
+message RequestDto {
+  string message = 1;
+}
+
+message ResponseDto {
+  string message = 1;
+}

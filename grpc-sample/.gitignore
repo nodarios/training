@@ -1,0 +1,10 @@
+.classpath
+.settings
+.project
+*.iml
+*.iws
+*.ipr
+.idea
+
+# Ignore everything in this directory
+target
