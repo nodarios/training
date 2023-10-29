@@ -1,11 +1,11 @@
-### Reference Documentation
-For further reference, please consider the following sections:
+# spring rest
 
-* [Official Gradle documentation](https://docs.gradle.org)
+* conforms to the highest level of the rest maturity model.
+* has api documentation.
 
 ---
 
-### Guides
-The following guides illustrate how to use some features concretely:
+### api documentation
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
+start service `./gradlew bootRun` and call below link to check api documentation:  
+[api documentation](http://localhost:8080/swagger-ui/index.html)

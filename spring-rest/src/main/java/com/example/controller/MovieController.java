@@ -1,13 +1,15 @@
 package com.example.controller;
 
-import com.example.dto.movie.MovieToAddDto;
+import com.example.assembler.MovieAssembler;
 import com.example.dto.movie.MovieDto;
-import com.example.dto.movie.MovieToUpdateDto;
+import com.example.dto.movie.MovieToAddDto;
 import com.example.entity.Movie;
 import com.example.mapper.MovieMapper;
 import com.example.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,41 +23,52 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/movies")
+@RequestMapping
 public class MovieController {
 
     private final MovieService movieService;
     private final MovieMapper movieMapper;
+    private final MovieAssembler movieAssembler;
 
-    @GetMapping("/{id}")
+    @GetMapping("/movies/{id}")
     @Operation(summary = "get movie by id")
-    public MovieDto get(@PathVariable Long id) {
+    public EntityModel<MovieDto> get(@PathVariable Long id) {
         Movie movie = movieService.get(id);
-        return movieMapper.mapEntityToDto(movie);
+        MovieDto movieDto = movieMapper.mapEntityToDto(movie);
+        return movieAssembler.toModel(movieDto);
     }
 
-    @GetMapping
+    @GetMapping("/movies")
     @Operation(summary = "get all movies")
-    public List<MovieDto> getAll() {
+    public CollectionModel<EntityModel<MovieDto>> getAll() {
         List<Movie> movies = movieService.getAll();
-        return movieMapper.mapEntitiesToDtos(movies);
+        List<MovieDto> movieDtos = movieMapper.mapEntitiesToDtos(movies);
+        return movieAssembler.toCollectionModel(movieDtos);
     }
 
-    @PostMapping
+    @GetMapping("/director/{id}/movies")
+    @Operation(summary = "get all movies by director")
+    public CollectionModel<EntityModel<MovieDto>> getAllByDirectorId(@PathVariable Long id) {
+        List<Movie> movies = movieService.getAllByDirectorId(id);
+        List<MovieDto> movieDtos = movieMapper.mapEntitiesToDtos(movies);
+        return movieAssembler.toCollectionModel(movieDtos);
+    }
+
+    @PostMapping("/movies")
     @Operation(summary = "add new movie")
-    public MovieDto add(@RequestBody MovieToAddDto movieToAddDto) {
+    public EntityModel<MovieDto> add(@RequestBody MovieToAddDto movieToAddDto) {
         Movie movie = movieService.add(movieMapper.mapDtoToEntity(movieToAddDto));
-        return movieMapper.mapEntityToDto(movie);
+        return movieAssembler.toModel(movieMapper.mapEntityToDto(movie));
     }
 
-    @PutMapping
+    @PutMapping("/movies")
     @Operation(summary = "update existing movie")
-    public MovieDto update(@RequestBody MovieToUpdateDto movieToUpdateDto) {
-        Movie movie = movieService.update(movieMapper.mapDtoToEntity(movieToUpdateDto));
-        return movieMapper.mapEntityToDto(movie);
+    public EntityModel<MovieDto> update(@RequestBody MovieDto movieDto) {
+        Movie movie = movieService.update(movieMapper.mapDtoToEntity(movieDto));
+        return movieAssembler.toModel(movieMapper.mapEntityToDto(movie));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/movies/{id}")
     @Operation(summary = "delete movie")
     public void delete(@PathVariable Long id) {
         movieService.delete(id);

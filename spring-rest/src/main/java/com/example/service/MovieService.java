@@ -26,6 +26,11 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<Movie> getAllByDirectorId(Long directorId) {
+        return movieRepository.findAllByDirectorId(directorId);
+    }
+
     public Movie add(Movie movie) {
         return movieRepository.save(movie);
     }

@@ -1,13 +1,15 @@
 package com.example.controller;
 
+import com.example.assembler.DirectorAssembler;
 import com.example.dto.director.DirectorDto;
 import com.example.dto.director.DirectorToAddDto;
-import com.example.dto.director.DirectorToUpdateDto;
 import com.example.entity.Director;
 import com.example.mapper.DirectorMapper;
 import com.example.service.DirectorService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,33 +28,36 @@ public class DirectorController {
 
     private final DirectorService directorService;
     private final DirectorMapper directorMapper;
+    private final DirectorAssembler directorAssembler;
 
     @GetMapping("/{id}")
     @Operation(summary = "get directorDto by id")
-    public DirectorDto get(@PathVariable Long id) {
+    public EntityModel<DirectorDto> get(@PathVariable Long id) {
         Director director = directorService.get(id);
-        return directorMapper.mapEntityToDto(director);
+        DirectorDto directorDto = directorMapper.mapEntityToDto(director);
+        return directorAssembler.toModel(directorDto);
     }
 
     @GetMapping
     @Operation(summary = "get all directors")
-    public List<DirectorDto> getAll() {
+    public CollectionModel<EntityModel<DirectorDto>> getAll() {
         List<Director> directors = directorService.getAll();
-        return directorMapper.mapEntitiesToDtos(directors);
+        List<DirectorDto> directorDtos = directorMapper.mapEntitiesToDtos(directors);
+        return directorAssembler.toCollectionModel(directorDtos);
     }
 
     @PostMapping
     @Operation(summary = "add new directorDto")
-    public DirectorDto add(@RequestBody DirectorToAddDto directorToAddDto) {
+    public EntityModel<DirectorDto> add(@RequestBody DirectorToAddDto directorToAddDto) {
         Director director = directorService.add(directorMapper.mapDtoToEntity(directorToAddDto));
-        return directorMapper.mapEntityToDto(director);
+        return directorAssembler.toModel(directorMapper.mapEntityToDto(director));
     }
 
     @PutMapping
     @Operation(summary = "update existing directorDto")
-    public DirectorDto update(@RequestBody DirectorToUpdateDto directorToUpdateDto) {
-        Director director = directorService.update(directorMapper.mapDtoToEntity(directorToUpdateDto));
-        return directorMapper.mapEntityToDto(director);
+    public EntityModel<DirectorDto> update(@RequestBody DirectorDto directorDto) {
+        Director director = directorService.update(directorMapper.mapDtoToEntity(directorDto));
+        return directorAssembler.toModel(directorMapper.mapEntityToDto(director));
     }
 
     @DeleteMapping("/{id}")
